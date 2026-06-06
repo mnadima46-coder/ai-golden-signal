@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "Backup": {
+      "title": "User Backup Data",
+      "description": "User specific session data, settings, and prediction history.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the record owner"
+        },
+        "winCount": {
+          "type": "integer",
+          "description": "Total won predictions in current session"
+        },
+        "lossCount": {
+          "type": "integer",
+          "description": "Total lost predictions in current session"
+        },
+        "historyLogs": {
+          "type": "array",
+          "description": "Array of prediction outcome history logs"
+        },
+        "trueMarketHistory": {
+          "type": "array",
+          "description": "Past result sizes recorded"
+        },
+        "wingoMode": {
+          "type": "string",
+          "description": "Wingo time interval duration setting"
+        },
+        "timeOffset": {
+          "type": "integer",
+          "description": "Clock alignment calibration offset"
+        },
+        "targetUrl": {
+          "type": "string",
+          "description": "Domain targeted by active session proxy"
+        },
+        "backupTime": {
+          "type": "string",
+          "description": "Formatted string timestamp of current upload"
+        },
+        "processedPeriods": {
+          "type": "array",
+          "description": "Wingo period numbers which have already been evaluated"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Standard timestamp of modifications"
+        }
+      },
+      "required": [
+        "userId",
+        "winCount",
+        "lossCount",
+        "historyLogs",
+        "trueMarketHistory",
+        "wingoMode",
+        "timeOffset",
+        "targetUrl",
+        "backupTime",
+        "processedPeriods"
+      ]
+    }
+  },
+  "firestore": {
+    "/backups/{userId}": {
+      "schema": "Backup",
+      "description": "Collection storing the latest user settings and metrics backup."
+    }
+  }
+}

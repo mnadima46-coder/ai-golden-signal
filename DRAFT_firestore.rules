@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidBackup(data) {
+      return data.userId is string && data.userId.size() <= 128 && data.userId == request.auth.uid
+        && data.winCount is int && data.winCount >= 0
+        && data.lossCount is int && data.lossCount >= 0
+        && data.historyLogs is list && data.historyLogs.size() <= 1000
+        && data.trueMarketHistory is list && data.trueMarketHistory.size() <= 100
+        && data.wingoMode is string && data.wingoMode.size() <= 20
+        && data.timeOffset is int
+        && data.targetUrl is string && data.targetUrl.size() <= 512
+        && data.backupTime is string && data.backupTime.size() <= 100
+        && data.processedPeriods is list && data.processedPeriods.size() <= 2000;
+    }
+
+    match /backups/{userId} {
+      allow get: if isSignedIn() && userId == request.auth.uid;
+      
+      allow create: if isEmailVerified() 
+        && isValidId(userId) 
+        && userId == request.auth.uid
+        && isValidBackup(incoming())
+        && incoming().updatedAt == request.time;
+        
+      allow update: if isEmailVerified()
+        && isValidId(userId)
+        && userId == request.auth.uid
+        && isValidBackup(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().userId == existing().userId;
+        
+      allow delete: if isSignedIn() && userId == request.auth.uid;
+    }
+  }
+}

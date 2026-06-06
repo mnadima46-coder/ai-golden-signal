@@ -1,0 +1,6 @@
+{
+  "name": "AI GOLDEN SIGNAL (Color Trading Edition)",
+  "description": "WinGo 30sec real-time color, number, and big/small signal decryption engine with Matrix Vox-Y voice assistant.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
